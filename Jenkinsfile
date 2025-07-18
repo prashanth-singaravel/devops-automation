@@ -10,18 +10,26 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    extensions: [],
+                    userRemoteConfigs: [[url: 'https://github.com/Raj9556/devops-automation.git']]
+                ])
+            }
+        }
+
         stage('Build Maven') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Raj9556/devops-automation.git']]])
                 sh 'mvn clean install'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh 'docker build -t srk96/devops-integration .'
-                }
+                sh 'docker build -t srk96/devops-integration .'
             }
         }
 
@@ -34,13 +42,28 @@ pipeline {
             }
         }
 
+        stage('Check kubectl and workspace') {
+            steps {
+                // Verify kubectl is available
+                sh 'echo "PATH is: $PATH"'
+                sh 'which kubectl'
+                sh 'kubectl version --client'
+
+                // List files in workspace to confirm deployment.yaml exists
+                sh 'ls -l deployment.yaml'
+            }
+        }
+
         stage('Deploy to k8s') {
             steps {
                 script {
-                    kubernetesDeploy(
-                        configs: 'deploymentservice.yaml',
-                        kubeconfigId: 'k8sconfigpwd'
-                    )
+                    // Wrap deployment in try-catch to print errors clearly
+                    try {
+                        sh 'kubectl apply -f deployment.yaml'
+                    } catch (Exception e) {
+                        echo "Deployment failed: ${e.getMessage()}"
+                        error("kubectl apply command failed, aborting pipeline")
+                    }
                 }
             }
         }
