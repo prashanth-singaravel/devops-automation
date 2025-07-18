@@ -50,7 +50,7 @@ pipeline {
                 sh 'kubectl version --client'
 
                 // List files in workspace to confirm deployment.yaml exists
-                sh 'ls -l deployment.yaml'
+                sh 'ls -l deploymentservice.yaml'
             }
         }
 
@@ -59,7 +59,7 @@ pipeline {
                 script {
                     // Wrap deployment in try-catch to print errors clearly
                     try {
-                        sh 'kubectl apply -f deployment.yaml'
+                        sh 'kubectl apply -f deploymentservice.yaml'
                     } catch (Exception e) {
                         echo "Deployment failed: ${e.getMessage()}"
                         error("kubectl apply command failed, aborting pipeline")
