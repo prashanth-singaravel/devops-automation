@@ -16,7 +16,7 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     extensions: [],
-                    userRemoteConfigs: [[url: 'https://github.com/Raj9556/devops-automation.git']]
+                    userRemoteConfigs: [[url: 'https://github.com/prashanth-singaravel/devops-automation.git']]
                 ])
             }
         }
@@ -29,16 +29,16 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t srk96/devops-integration .'
+                sh 'docker build -t prashanthsingaravel/devops-integration .'
             }
         }
 
         stage('Push Image to Docker Hub') {
             steps {
-                withCredentials([string(credentialsId: 'srk96', variable: 'dockerhubpwd')]) {
-                    sh 'docker login -u srk96 -p ${dockerhubpwd}'
+                withCredentials([string(credentialsId: 'prashanthsingaravel', variable: 'dockerhubpwd')]) {
+                    sh 'docker login -u prashanthsingaravel -p ${dockerhubpwd}'
                 }
-                sh 'docker push srk96/devops-integration'
+                sh 'docker push prashanthsingaravel/devops-integration'
             }
         }
 
