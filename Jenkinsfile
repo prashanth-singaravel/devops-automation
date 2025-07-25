@@ -35,8 +35,8 @@ pipeline {
 
         stage('Push Image to Docker Hub') {
             steps {
-                withCredentials([string(credentialsId: 'prashanthsingaravel-dockerhub', variable: 'dockerhubpwd')]) {
-                    sh 'docker login -u prashanthsingaravel -p ${dockerhubpwd}'
+                 withCredentials([string(credentialsId: 'prashanthsingaravel', variable: 'docker')]) {
+                    sh 'docker login -u prashanthsingaravel -p ${docker}'
                 }
                 sh 'docker push prashanthsingaravel/devops-integration'
             }
